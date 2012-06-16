@@ -35,7 +35,7 @@ public class Solution {
 	protected double evaluation;
 
 	/*
-	 * Array of the production dates, indice is job
+	 * Array of the production dates, index is job
 	 */
 	protected double productionStartingDates[];
 	public double productionCompletionTimes[];
@@ -47,12 +47,12 @@ public class Solution {
 	protected double evaluationCustomer;
 
 	/*
-	 * Array of the first transporter departure, indice is a transporter
+	 * Array of the first transporter departure, index is a transporter
 	 */
 	protected double dateTransporterDeparture;
 	protected double dateProductionDeparture;
 
-	public static final double MOINS_INFINI = -1000000.0;
+	public static final double NEG_INF = -1000000.0;
 
 	/**
 	 * multi transporter loading sequence : a solution is composed of different
@@ -179,7 +179,7 @@ public class Solution {
 	 * @param j
 	 *            = quantity of delivered parts
 	 * @param tr
-	 *            = transporteur
+	 *            = transporter
 	 */
 	public void addDeliveryFirst(int j) {
 		deliverySequenceMT.add(0, new Batch(j));
