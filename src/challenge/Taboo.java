@@ -36,8 +36,9 @@ public class Taboo {
 		
 		// random selection of transport batches
 		
-		while (n> 0) {
-			r = rand.nextInt(n) + 1;
+		int cap = pb.transporter.getCapacity();
+		while (n > 0) {
+			r = rand.nextInt(Math.min(n,cap)) + 1; // can't exceed transporter's capacity in a delivery batch
 			solStr += r + " ";
 			n -= r;
 		}
@@ -53,6 +54,7 @@ public class Taboo {
 		Solution best = new Solution(pb); // best neighbor solution
 		best.setWorst();
 		int pS, dS, randBatch; // solution's productionSequence and deliverySequence vector sizes
+		int cap = pb.transporter.getCapacity();
 		Random rand = new Random();
 		
 		// each time bestNeighbor() is called, the best neighbor from sizeNL randomly chosen neighbors is returned
@@ -80,7 +82,7 @@ public class Taboo {
 			tmp.getProductionSequenceMT().elementAt(randBatch).incQuantity(); // increment chosen batch 
 			
 			// deliverySequenceMT modifying
-			// same as above
+			// same as above, taking into account the transporter's capacity
 			
 			randBatch = rand.nextInt(dS);
 			tmp.getDeliverySequenceMT().elementAt(randBatch).decQuantity();
@@ -88,19 +90,23 @@ public class Taboo {
 				tmp.getDeliverySequenceMT().remove(randBatch);
 				--dS;
 			}
-			randBatch = rand.nextInt(dS+1);
-			if (randBatch == dS) {
+			boolean repeat = false;
+			do {
 				randBatch = rand.nextInt(dS+1);
-				tmp.getDeliverySequenceMT().add(randBatch, new Batch(0));
-				// ++dS;
-			}
+				if (randBatch == dS) {
+					randBatch = rand.nextInt(dS+1);
+					tmp.getDeliverySequenceMT().add(randBatch, new Batch(0));
+					// ++dS;
+				} else if (tmp.getDeliverySequenceMT().elementAt(randBatch).getQuantity() == cap)
+					repeat = true;
+			} while (repeat);
 			tmp.getDeliverySequenceMT().elementAt(randBatch).incQuantity();
 			
 			tmp.evaluate();
 			
-			System.out.print(sizeNL + " : \n bestSol=" + best.getProductionSequenceMT().toString() + best.getDeliverySequenceMT().toString() + 
-					"\n tmpSol= " + tmp.getProductionSequenceMT().toString() + tmp.getDeliverySequenceMT().toString() + 
-					"\n Sol=    " + sol.getProductionSequenceMT().toString() + sol.getDeliverySequenceMT().toString() +
+			System.out.print(sizeNL + " : \n bestSol=" + best.evaluation + " " + best.getProductionSequenceMT().toString() + best.getDeliverySequenceMT().toString() + 
+					"\n tmpSol= " + tmp.evaluation + " " + tmp.getProductionSequenceMT().toString() + tmp.getDeliverySequenceMT().toString() + 
+					"\n Sol=    " + sol.evaluation + " " + sol.getProductionSequenceMT().toString() + sol.getDeliverySequenceMT().toString() +
 					"\n\nTabooList=");
 			
 			for(Solution item : tabooList) {
@@ -125,7 +131,6 @@ public class Taboo {
 		bestSolution = solution.clone(pb);
 		
 		tabooList.add(solution.clone(pb));
-		System.out.print("randomSol=" + solution.getProductionSequenceMT().toString() + solution.getDeliverySequenceMT().toString() + "\n");
 	
 		while (iter > 0) {
 			System.out.print(iter + "\n");

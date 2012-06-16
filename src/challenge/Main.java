@@ -45,7 +45,7 @@ public class Main {
 		//Solution sol = new Solution(pb);
 		//sol.setFromString("25 25/10 15 15 10");
 		
-		int iter = 1;	// number of taboo iterations
+		int iter = 3;	// number of taboo iterations
 		int sizeTL = 5;		// taboo length
 		int sizeNL = 10;	// number of neighbors considered per taboo iteration
 		

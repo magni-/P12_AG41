@@ -102,6 +102,9 @@ public class Solution {
 		
 		cloneSol.deliverySequenceMT = Main.cloneVB(deliverySequenceMT);
 		cloneSol.productionSequenceMT = Main.cloneVB(productionSequenceMT);
+		
+		cloneSol.evaluate();
+		
 		return cloneSol;
 	}
 	
