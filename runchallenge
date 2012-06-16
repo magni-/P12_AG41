@@ -2,5 +2,5 @@
 
 export CLASSPATH=$CLASSPATH:./bin
 
-java Main
+java challenge/Main
 

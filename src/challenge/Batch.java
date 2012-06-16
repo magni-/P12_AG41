@@ -47,9 +47,21 @@ public class Batch {
 	public void setQuantity(int quantity) {
 		this.quantity = quantity;
 	}
+	
+	public void incQuantity() {
+		++quantity;
+	}
+	
+	public void decQuantity() {
+		--quantity;
+	}
 
 	public String toString() {
 		return new String("" + quantity);
+	}
+	
+	public Batch clone() {
+		return new Batch(quantity);
 	}
 
 }

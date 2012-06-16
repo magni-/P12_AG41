@@ -38,9 +38,20 @@ public class Solution {
 	 * Array of the production dates, index is job
 	 */
 	protected double productionStartingDates[];
+	public double[] getProductionStartingDates() {
+		return productionStartingDates;
+	}
+
 	public double productionCompletionTimes[];
+	public double[] getProductionCompletionTimes() {
+		return productionCompletionTimes;
+	}
 
 	public double transportationCompletionTimes[];
+
+	public double[] getTransportationCompletionTimes() {
+		return transportationCompletionTimes;
+	}
 
 	protected double evaluationManufacturer;
 	protected double evaluationTransporter;
@@ -59,12 +70,18 @@ public class Solution {
 	 * batches, each batch is defined by the identifier of the transporter and
 	 * the number of transported parts.
 	 */
-	protected Vector deliverySequenceMT;
+	protected Vector<Batch> deliverySequenceMT;
+	public Vector<Batch> getDeliverySequenceMT() {
+		return deliverySequenceMT;
+	}
 
 	/**
 	 * production sequence :
 	 */
-	protected Vector productionSequenceMT;
+	protected Vector<Batch> productionSequenceMT;
+	public Vector<Batch> getProductionSequenceMT() {
+		return productionSequenceMT;
+	}
 
 	// ----------------------------------------
 	public Solution(Problem pb_) {
@@ -73,19 +90,30 @@ public class Solution {
 		transportationCompletionTimes = new double[slpb.getNp()];
 		productionStartingDates = new double[slpb.getNp()];
 
-		deliverySequenceMT = new Vector();
-		productionSequenceMT = new Vector();
+		deliverySequenceMT = new Vector<Batch>();
+		productionSequenceMT = new Vector<Batch>();
 	}
 
+	public Solution clone(Problem pb) {
+		Solution cloneSol = new Solution(pb);
+		cloneSol.productionCompletionTimes = productionCompletionTimes;
+		cloneSol.transportationCompletionTimes = transportationCompletionTimes;
+		cloneSol.productionStartingDates = productionStartingDates;
+		
+		cloneSol.deliverySequenceMT = Main.cloneVB(deliverySequenceMT);
+		cloneSol.productionSequenceMT = Main.cloneVB(productionSequenceMT);
+		return cloneSol;
+	}
+	
 	public void reset() {
-		deliverySequenceMT = new Vector();
-		productionSequenceMT = new Vector();
+		deliverySequenceMT = new Vector<Batch>();
+		productionSequenceMT = new Vector<Batch>();
 		productionCompletionTimes = new double[slpb.getNp()];
 		productionStartingDates = new double[slpb.getNp()];
 		System.gc();
 	}
 
-	public void setDeliverySequenceMT(Vector newListChargt1) {
+	public void setDeliverySequenceMT(Vector<Batch> newListChargt1) {
 		deliverySequenceMT = newListChargt1;
 	}
 
@@ -128,10 +156,12 @@ public class Solution {
 	}
 
 	// ----------------------------------------
+	@SuppressWarnings("unused")
 	private void setDeliveryBatch(int i, Batch b) {
 		deliverySequenceMT.set(i, b);
 	}
 
+	@SuppressWarnings("unused")
 	private void insertDeliveryBatch(int i5, Batch batch) {
 		deliverySequenceMT.insertElementAt(batch, i5);
 	}
@@ -341,6 +371,7 @@ public class Solution {
 		 */
 		private void evaluateSupplierCosts() {
 			int indiceProdBatch = getNumberOfProducedBatches() - 1;
+			@SuppressWarnings("unused")
 			int sumProd = 0;
 
 			job = slpb.getNp() - 1;
@@ -401,6 +432,16 @@ public class Solution {
 
 		Evaluator ev = new Evaluator();
 		return ev.evaluate();
+	}
+	
+	public void setWorst() {
+		evaluation = 1000000.00;
+	}
+	
+	@Override
+	public boolean equals(Object o) {
+		Solution s = (Solution) o;
+		return (productionSequenceMT == s.productionSequenceMT && deliverySequenceMT == s.deliverySequenceMT);
 	}
 
 	/**

@@ -21,7 +21,7 @@ public class Taboo {
 		int n = pb.getNp(), r;
 		String solStr = "";
 		Solution sol = new Solution(pb);
-		Random rand = new Random();
+		Random rand = new Random();;
 		
 		// random selection of production batches
 		
@@ -48,28 +48,101 @@ public class Taboo {
 		return sol;
 	}
 	
-	public Taboo(Problem pb, int length) {
-		tabooList = null;
-		tabooLength = length;
+	public Solution bestNeighbor(Problem pb, Solution sol, int sizeNL) {
+		Solution tmp; // temporary neighbor solution
+		Solution best = new Solution(pb); // best neighbor solution
+		best.setWorst();
+		int pS, dS, randBatch; // solution's productionSequence and deliverySequence vector sizes
+		Random rand = new Random();
+		
+		// each time bestNeighbor() is called, the best neighbor from sizeNL randomly chosen neighbors is returned
+		
+		while (sizeNL > 0) {
+			tmp = sol.clone(pb);	// tmp neighbors are initialized to the calling solution
+			
+			pS = tmp.getProductionSequenceMT().size();
+			dS = tmp.getDeliverySequenceMT().size();
+			
+			// productionSequenceMT modifying
+			
+			randBatch = rand.nextInt(pS);	// one prodbatch is randomly selected
+			tmp.getProductionSequenceMT().elementAt(randBatch).decQuantity(); // its quantity decremented
+			if (tmp.getProductionSequenceMT().elementAt(randBatch).getQuantity() == 0) {	// if that batch is now empty
+				tmp.getProductionSequenceMT().remove(randBatch);	// we remove it
+				--pS;										// and decrement the amount of prodbatches
+			}
+			randBatch = rand.nextInt(pS+1);	// pS+1 instead of pS to give the possibility of creating a new prodbatch
+			if (randBatch == pS) {	// create new batch
+				randBatch = rand.nextInt(pS+1);	// choose where to put it
+				tmp.getProductionSequenceMT().add(randBatch, new Batch(0)); // and give it 0 jobs
+				// ++pS; (not needed as pS is not reused)
+			}
+			tmp.getProductionSequenceMT().elementAt(randBatch).incQuantity(); // increment chosen batch 
+			
+			// deliverySequenceMT modifying
+			// same as above
+			
+			randBatch = rand.nextInt(dS);
+			tmp.getDeliverySequenceMT().elementAt(randBatch).decQuantity();
+			if (tmp.getDeliverySequenceMT().elementAt(randBatch).getQuantity() == 0) {
+				tmp.getDeliverySequenceMT().remove(randBatch);
+				--dS;
+			}
+			randBatch = rand.nextInt(dS+1);
+			if (randBatch == dS) {
+				randBatch = rand.nextInt(dS+1);
+				tmp.getDeliverySequenceMT().add(randBatch, new Batch(0));
+				// ++dS;
+			}
+			tmp.getDeliverySequenceMT().elementAt(randBatch).incQuantity();
+			
+			tmp.evaluate();
+			
+			System.out.print(sizeNL + " : \n bestSol=" + best.getProductionSequenceMT().toString() + best.getDeliverySequenceMT().toString() + 
+					"\n tmpSol= " + tmp.getProductionSequenceMT().toString() + tmp.getDeliverySequenceMT().toString() + 
+					"\n Sol=    " + sol.getProductionSequenceMT().toString() + sol.getDeliverySequenceMT().toString() +
+					"\n\nTabooList=");
+			
+			for(Solution item : tabooList) {
+				System.out.print(item.getProductionSequenceMT().toString() + item.getDeliverySequenceMT().toString() + "\n");
+			}
+			
+			if (tabooList.contains(tmp) == false) {	// only possible if neighbor not in taboo
+				--sizeNL; // one less neighbor to go
+				if (tmp.evaluation < best.evaluation)	// update best if needed
+					best = tmp.clone(pb);
+			}
+		}			
+			
+		return best;
+	}
+	
+	public Taboo(Problem pb, int iter, int sizeTL, int sizeNL) {
+		tabooList = new ArrayList<Solution>();
+		tabooLength = sizeTL;
 		solution = randomSolution(pb);
-		bestSolution = solution;
-	// to do - sol = randomly generated solution
-	//			best = sol
-	//			tabou.add(sol)
+		solution.evaluate();
+		bestSolution = solution.clone(pb);
+		
+		tabooList.add(solution.clone(pb));
+		System.out.print("randomSol=" + solution.getProductionSequenceMT().toString() + solution.getDeliverySequenceMT().toString() + "\n");
 	
-	// while loop
-	
-	// to do - newSol = modify(sol)
-	
-	// to do - newSol.possible() ? (sh.be true)
-	//			tabou.include(newSol) ? (sh.be false)
-	//			sol.cost - newSol.cost > maxWorsen ? (sh.be false)
-	
-	// to do - add to taboo
-	//			sol = newSol
-	//			better than best ? => best = sol
-	
-	// end while
+		while (iter > 0) {
+			System.out.print(iter + "\n");
+			
+			newSolution = bestNeighbor(pb, solution, sizeNL);
+			
+			if (newSolution.evaluation < bestSolution.evaluation)
+				bestSolution = newSolution.clone(pb);
+			
+			if (tabooList.size() == tabooLength)
+				tabooList.remove(0);
+			
+			tabooList.add(newSolution.clone(pb));
+			solution = newSolution.clone(pb);
+			
+			--iter;
+		}
 	}
 	
 }

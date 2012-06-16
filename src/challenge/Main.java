@@ -1,5 +1,7 @@
 package challenge;
 
+import java.util.Vector;
+
 /**
  * 
  *     This file is part of ag41-print12-challenge.
@@ -28,6 +30,13 @@ package challenge;
  */
 public class Main {
 
+	public static Vector<Batch> cloneVB(Vector<Batch> v) {
+		Vector<Batch> nv = new Vector<Batch>();
+		for(Batch b : v)
+			nv.add(b.clone());
+		return nv;
+	}
+	
 	// ----------------------------------------
 	public static void main(String[] args) {
 		Problem pb = new Problem("data/problem003-050.txt");
@@ -36,8 +45,12 @@ public class Main {
 		//Solution sol = new Solution(pb);
 		//sol.setFromString("25 25/10 15 15 10");
 		
-		Taboo tab = new Taboo(pb, 5);
+		int iter = 1;	// number of taboo iterations
+		int sizeTL = 5;		// taboo length
+		int sizeNL = 10;	// number of neighbors considered per taboo iteration
 		
+		Taboo tab = new Taboo(pb, iter, sizeTL, sizeNL);
+			
 		Solution sol = tab.getBest();
 		
 		sol.evaluate();
