@@ -40,20 +40,21 @@ public class Main {
 	// ----------------------------------------
 	public static void main(String[] args) {
 		Problem pb = new Problem("data/problem003-050.txt");
-		System.out.println("problem=" + pb.toString() + "\n");
+		//System.out.println("problem=" + pb.toString() + "\n");
 
 		//Solution sol = new Solution(pb);
 		//sol.setFromString("25 25/10 15 15 10");
 		
-		int iter = 3;	// number of taboo iterations
-		int sizeTL = 5;		// taboo length
-		int sizeNL = 10;	// number of neighbors considered per taboo iteration
+		int iter = 10000;	// number of taboo iterations
+		int sizeTL = 10;	// taboo length
+		int sizeNL = 50;	// number of neighbors considered per taboo iteration
 		
-		Taboo tab = new Taboo(pb, iter, sizeTL, sizeNL);
-			
+		Taboo tab = new Taboo(pb, iter, sizeTL, sizeNL);	
 		Solution sol = tab.getBest();
 		
 		sol.evaluate();
-		System.out.println("solution=" + sol.toString());
+		System.out.println("\rsolution= (eval) " + sol.evaluation + 
+				"\n   (prodBatchSeq) " + sol.productionSequenceMT.toString() +
+				"\n   (deliBatchSeq) " + sol.deliverySequenceMT.toString() + "\n");
 	}
 }

@@ -104,7 +104,7 @@ public class Taboo {
 			
 			tmp.evaluate();
 			
-			System.out.print(sizeNL + " : \n bestSol=" + best.evaluation + " " + best.getProductionSequenceMT().toString() + best.getDeliverySequenceMT().toString() + 
+/*			System.out.print(sizeNL + " : \n bestSol=" + best.evaluation + " " + best.getProductionSequenceMT().toString() + best.getDeliverySequenceMT().toString() + 
 					"\n tmpSol= " + tmp.evaluation + " " + tmp.getProductionSequenceMT().toString() + tmp.getDeliverySequenceMT().toString() + 
 					"\n Sol=    " + sol.evaluation + " " + sol.getProductionSequenceMT().toString() + sol.getDeliverySequenceMT().toString() +
 					"\n\nTabooList=");
@@ -112,7 +112,7 @@ public class Taboo {
 			for(Solution item : tabooList) {
 				System.out.print(item.getProductionSequenceMT().toString() + item.getDeliverySequenceMT().toString() + "\n");
 			}
-			
+*/			
 			if (tabooList.contains(tmp) == false) {	// only possible if neighbor not in taboo
 				--sizeNL; // one less neighbor to go
 				if (tmp.evaluation < best.evaluation)	// update best if needed
@@ -132,9 +132,9 @@ public class Taboo {
 		
 		tabooList.add(solution.clone(pb));
 	
-		while (iter > 0) {
-			System.out.print(iter + "\n");
-			
+		int currIter = 0;
+		while (currIter < iter) {
+			System.out.print("\r"+(100*currIter)/iter+"%");
 			newSolution = bestNeighbor(pb, solution, sizeNL);
 			
 			if (newSolution.evaluation < bestSolution.evaluation)
@@ -146,7 +146,7 @@ public class Taboo {
 			tabooList.add(newSolution.clone(pb));
 			solution = newSolution.clone(pb);
 			
-			--iter;
+			++currIter;
 		}
 	}
 	
