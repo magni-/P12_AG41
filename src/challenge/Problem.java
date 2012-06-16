@@ -27,9 +27,9 @@ package challenge;
  *
  */
 import java.util.Arrays;
-import java.util.Random;
+//import java.util.Random;
 import java.util.StringTokenizer;
-import java.util.Vector;
+//import java.util.Vector;
 
 public class Problem {
 
@@ -110,7 +110,7 @@ public class Problem {
 	 * Get the customer Holding cost for job i with completion time=t
 	 * 
 	 * @param i
-	 *            : job indice
+	 *            : job index
 	 * @param t
 	 *            : completionTime
 	 * @return
@@ -131,7 +131,7 @@ public class Problem {
 	}
 
 	/**
-	 * Ouverture d'un fichier de type supplychain problem
+	 * Open a supply chain type problem file
 	 * 
 	 * @see GProblem#open(java.lang.String)
 	 */

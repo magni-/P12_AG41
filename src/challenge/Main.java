@@ -33,8 +33,13 @@ public class Main {
 		Problem pb = new Problem("data/problem003-050.txt");
 		System.out.println("problem=" + pb.toString() + "\n");
 
-		Solution sol = new Solution(pb);
-		sol.setFromString("25 25/10 15 15 10");
+		//Solution sol = new Solution(pb);
+		//sol.setFromString("25 25/10 15 15 10");
+		
+		Taboo tab = new Taboo(pb, 5);
+		
+		Solution sol = tab.getBest();
+		
 		sol.evaluate();
 		System.out.println("solution=" + sol.toString());
 	}
