@@ -49,81 +49,92 @@ public class Taboo {
 		return sol;
 	}
 	
-	public Solution bestNeighbor(Problem pb, Solution sol, int sizeNL) {
-		Solution tmp; // temporary neighbor solution
-		Solution best = new Solution(pb); // best neighbor solution
+	public Solution bestNeighbor(Problem pb, Solution sol, int sizeNL, int var) {		
+		Solution tmp; 						// temporary neighbor solution
+		Solution best = new Solution(pb); 	// best neighbor solution
 		best.setWorst();
-		int pS, dS, randBatch; // solution's productionSequence and deliverySequence vector sizes
+		
+		int pS, dS; 				// solution's productionSequence and deliverySequence vector sizes
+		int pSinit = sol.getProductionSequenceMT().size();
+		int dSinit = sol.getDeliverySequenceMT().size();
+		
+		int nvar;
 		int cap = pb.transporter.getCapacity();
+		
 		Random rand = new Random();
+		int randBatch;
 		
 		// each time bestNeighbor() is called, the best neighbor from sizeNL randomly chosen neighbors is returned
 		
 		while (sizeNL > 0) {
 			tmp = sol.clone(pb);	// tmp neighbors are initialized to the calling solution
 			
-			pS = tmp.getProductionSequenceMT().size();
-			dS = tmp.getDeliverySequenceMT().size();
+			pS = pSinit;
+			dS = dSinit;
 			
 			// productionSequenceMT modifying
 			
-			randBatch = rand.nextInt(pS);	// one prodbatch is randomly selected
-			tmp.getProductionSequenceMT().elementAt(randBatch).decQuantity(); // its quantity decremented
-			if (tmp.getProductionSequenceMT().elementAt(randBatch).getQuantity() == 0) {	// if that batch is now empty
-				tmp.getProductionSequenceMT().remove(randBatch);	// we remove it
-				--pS;										// and decrement the amount of prodbatches
-			}
-			randBatch = rand.nextInt(pS+1);	// pS+1 instead of pS to give the possibility of creating a new prodbatch
-			if (randBatch == pS) {	// create new batch
+			nvar = var; 
+			do {
+				randBatch = rand.nextInt(pS);	// one prodbatch is randomly selected
+				if (tmp.getProductionSequenceMT().elementAt(randBatch).getQuantity() <= nvar) {	// if that prodbatch doesn't have enough jobs, we'll  
+					nvar = nvar - tmp.getProductionSequenceMT().elementAt(randBatch).getQuantity(); // need to split the decrementation with another prodbatch
+					tmp.getProductionSequenceMT().remove(randBatch);				// we remove it
+					--pS;															// and decrement the amount of prodbatches
+				} else {
+					tmp.getProductionSequenceMT().elementAt(randBatch).decQuantity(nvar);
+					nvar = 0;
+				}
+			} while (nvar > 0);
+			
+			randBatch = rand.nextInt(2*pS);		// 2*pS instead of pS to give the possibility of creating a new prodbatch
+			if (randBatch >= pS) {				// create new batch
 				randBatch = rand.nextInt(pS+1);	// choose where to put it
 				tmp.getProductionSequenceMT().add(randBatch, new Batch(0)); // and give it 0 jobs
-				// ++pS; (not needed as pS is not reused)
 			}
-			tmp.getProductionSequenceMT().elementAt(randBatch).incQuantity(); // increment chosen batch 
+			tmp.getProductionSequenceMT().elementAt(randBatch).incQuantity(var); // increment chosen batch 
 			
 			// deliverySequenceMT modifying
 			// same as above, taking into account the transporter's capacity
 			
-			randBatch = rand.nextInt(dS);
-			tmp.getDeliverySequenceMT().elementAt(randBatch).decQuantity();
-			if (tmp.getDeliverySequenceMT().elementAt(randBatch).getQuantity() == 0) {
-				tmp.getDeliverySequenceMT().remove(randBatch);
-				--dS;
-			}
-			boolean repeat = false;
+			nvar = var; 
 			do {
-				randBatch = rand.nextInt(dS+1);
-				if (randBatch == dS) {
+				randBatch = rand.nextInt(dS);
+				if (tmp.getDeliverySequenceMT().elementAt(randBatch).getQuantity() <= nvar) {  
+					nvar = nvar - tmp.getDeliverySequenceMT().elementAt(randBatch).getQuantity();
+					tmp.getDeliverySequenceMT().remove(randBatch);
+					--dS;
+				} else {
+					tmp.getDeliverySequenceMT().elementAt(randBatch).decQuantity(nvar);
+					nvar = 0;
+				}
+			} while (nvar > 0);
+			
+			boolean repeat;
+			do {
+				repeat = false;
+				randBatch = rand.nextInt(2*dS);
+				if (randBatch >= dS) {
 					randBatch = rand.nextInt(dS+1);
 					tmp.getDeliverySequenceMT().add(randBatch, new Batch(0));
-					// ++dS;
 				} else if (tmp.getDeliverySequenceMT().elementAt(randBatch).getQuantity() == cap)
 					repeat = true;
 			} while (repeat);
-			tmp.getDeliverySequenceMT().elementAt(randBatch).incQuantity();
+			tmp.getDeliverySequenceMT().elementAt(randBatch).incQuantity(var);
 			
 			tmp.evaluate();
-			
-/*			System.out.print(sizeNL + " : \n bestSol=" + best.evaluation + " " + best.getProductionSequenceMT().toString() + best.getDeliverySequenceMT().toString() + 
-					"\n tmpSol= " + tmp.evaluation + " " + tmp.getProductionSequenceMT().toString() + tmp.getDeliverySequenceMT().toString() + 
-					"\n Sol=    " + sol.evaluation + " " + sol.getProductionSequenceMT().toString() + sol.getDeliverySequenceMT().toString() +
-					"\n\nTabooList=");
-			
-			for(Solution item : tabooList) {
-				System.out.print(item.getProductionSequenceMT().toString() + item.getDeliverySequenceMT().toString() + "\n");
-			}
-*/			
-			if (tabooList.contains(tmp) == false) {	// only possible if neighbor not in taboo
-				--sizeNL; // one less neighbor to go
+					
+			if (tabooList.contains(tmp) == false) {		// only possible if neighbor not in taboo
+				--sizeNL; 								// one less neighbor to go
 				if (tmp.evaluation < best.evaluation)	// update best if needed
 					best = tmp.clone(pb);
-			}
+			}		
 		}			
 			
 		return best;
 	}
 	
-	public Taboo(Problem pb, int iter, int sizeTL, int sizeNL) {
+	public Taboo(Problem pb, int iter, int sizeTL, int sizeNL, int var) {
 		tabooList = new ArrayList<Solution>();
 		tabooLength = sizeTL;
 		solution = randomSolution(pb);
@@ -135,7 +146,7 @@ public class Taboo {
 		int currIter = 0;
 		while (currIter < iter) {
 			System.out.print("\r"+(100*currIter)/iter+"%...");
-			newSolution = bestNeighbor(pb, solution, sizeNL);
+			newSolution = bestNeighbor(pb, solution, sizeNL, var);
 			
 			if (newSolution.evaluation < bestSolution.evaluation)
 				bestSolution = newSolution.clone(pb);

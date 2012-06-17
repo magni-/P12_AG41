@@ -50,12 +50,14 @@ public class Main {
 		int iter = 1000;	// number of taboo iterations
 		int sizeTL = 5;		// taboo length
 		int sizeNL = 10;	// number of neighbors considered per taboo iteration
+		int var = 3;		// variation between neighbor solutions
 		
-		if (args.length == 3) {
+		if (args.length == 4) {
 			try {
 				iter = Integer.parseInt(args[0]);
 				sizeTL = Integer.parseInt(args[1]);
 				sizeNL = Integer.parseInt(args[2]);
+				var = Integer.parseInt(args[3]);
 	        } catch (NumberFormatException nfe) {
 	            System.out.println("If user-defined parameters, they must be three integers.");
 	            System.exit(1);
@@ -65,9 +67,10 @@ public class Main {
 		System.out.print("Taboo Parameters: \n " +
 				iter + " iterations\n " +
 				sizeTL + " size of taboo list\n " +
-				sizeNL + " neighbors considered per iteration\n\n");
+				sizeNL + " neighbors considered per iteration\n " +
+				var + " variation between neighbor solutions\n\n");
 		
-		Taboo tab = new Taboo(pb, iter, sizeTL, sizeNL);	
+		Taboo tab = new Taboo(pb, iter, sizeTL, sizeNL, var);	
 		Solution sol = tab.getBest();
 		
 		sol.evaluate();

@@ -48,12 +48,12 @@ public class Batch {
 		this.quantity = quantity;
 	}
 	
-	public void incQuantity() {
-		++quantity;
+	public void incQuantity(int inc) {
+		quantity += inc;
 	}
 	
-	public void decQuantity() {
-		--quantity;
+	public void decQuantity(int dec) {
+		quantity -= dec;
 	}
 
 	public String toString() {
