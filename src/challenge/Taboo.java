@@ -58,7 +58,7 @@ public class Taboo {
 		int pSinit = sol.getProductionSequenceMT().size();
 		int dSinit = sol.getDeliverySequenceMT().size();
 		
-		int nvar;
+		int bNvar, dWvar;
 		int cap = pb.transporter.getCapacity();
 		
 		Random rand = new Random();
@@ -74,41 +74,42 @@ public class Taboo {
 			
 			// productionSequenceMT modifying
 			
-			nvar = var; 
+			bNvar = rand.nextInt(var)+1;
+			dWvar = bNvar;
 			do {
 				randBatch = rand.nextInt(pS);	// one prodbatch is randomly selected
-				if (tmp.getProductionSequenceMT().elementAt(randBatch).getQuantity() <= nvar) {	// if that prodbatch doesn't have enough jobs, we'll  
-					nvar = nvar - tmp.getProductionSequenceMT().elementAt(randBatch).getQuantity(); // need to split the decrementation with another prodbatch
+				if (tmp.getProductionSequenceMT().elementAt(randBatch).getQuantity() <= dWvar) {	// if that prodbatch doesn't have enough jobs, we'll  
+					dWvar = dWvar - tmp.getProductionSequenceMT().elementAt(randBatch).getQuantity(); // need to split the decrementation with another prodbatch
 					tmp.getProductionSequenceMT().remove(randBatch);				// we remove it
 					--pS;															// and decrement the amount of prodbatches
 				} else {
-					tmp.getProductionSequenceMT().elementAt(randBatch).decQuantity(nvar);
-					nvar = 0;
+					tmp.getProductionSequenceMT().elementAt(randBatch).decQuantity(dWvar);
+					dWvar = 0;
 				}
-			} while (nvar > 0);
+			} while (dWvar > 0);
 			
 			randBatch = rand.nextInt(2*pS);		// 2*pS instead of pS to give the possibility of creating a new prodbatch
 			if (randBatch >= pS) {				// create new batch
 				randBatch = rand.nextInt(pS+1);	// choose where to put it
 				tmp.getProductionSequenceMT().add(randBatch, new Batch(0)); // and give it 0 jobs
 			}
-			tmp.getProductionSequenceMT().elementAt(randBatch).incQuantity(var); // increment chosen batch 
+			tmp.getProductionSequenceMT().elementAt(randBatch).incQuantity(bNvar); // increment chosen batch 
 			
 			// deliverySequenceMT modifying
 			// same as above, taking into account the transporter's capacity
 			
-			nvar = var; 
+			dWvar = bNvar;
 			do {
 				randBatch = rand.nextInt(dS);
-				if (tmp.getDeliverySequenceMT().elementAt(randBatch).getQuantity() <= nvar) {  
-					nvar = nvar - tmp.getDeliverySequenceMT().elementAt(randBatch).getQuantity();
+				if (tmp.getDeliverySequenceMT().elementAt(randBatch).getQuantity() <= dWvar) {  
+					dWvar = dWvar - tmp.getDeliverySequenceMT().elementAt(randBatch).getQuantity();
 					tmp.getDeliverySequenceMT().remove(randBatch);
 					--dS;
 				} else {
-					tmp.getDeliverySequenceMT().elementAt(randBatch).decQuantity(nvar);
-					nvar = 0;
+					tmp.getDeliverySequenceMT().elementAt(randBatch).decQuantity(dWvar);
+					dWvar = 0;
 				}
-			} while (nvar > 0);
+			} while (dWvar > 0);
 			
 			boolean repeat;
 			do {
@@ -120,7 +121,7 @@ public class Taboo {
 				} else if (tmp.getDeliverySequenceMT().elementAt(randBatch).getQuantity() == cap)
 					repeat = true;
 			} while (repeat);
-			tmp.getDeliverySequenceMT().elementAt(randBatch).incQuantity(var);
+			tmp.getDeliverySequenceMT().elementAt(randBatch).incQuantity(bNvar);
 			
 			tmp.evaluate();
 					

@@ -50,7 +50,7 @@ public class Main {
 		int iter = 1000;	// number of taboo iterations
 		int sizeTL = 5;		// taboo length
 		int sizeNL = 10;	// number of neighbors considered per taboo iteration
-		int var = 3;		// variation between neighbor solutions
+		int var = 3;		// max variation between neighbor solutions
 		
 		if (args.length == 4) {
 			try {
@@ -68,7 +68,7 @@ public class Main {
 				iter + " iterations\n " +
 				sizeTL + " size of taboo list\n " +
 				sizeNL + " neighbors considered per iteration\n " +
-				var + " variation between neighbor solutions\n\n");
+				var + " max variation between neighbor solutions\n\n");
 		
 		Taboo tab = new Taboo(pb, iter, sizeTL, sizeNL, var);	
 		Solution sol = tab.getBest();
