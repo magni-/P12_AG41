@@ -134,7 +134,7 @@ public class Taboo {
 	
 		int currIter = 0;
 		while (currIter < iter) {
-			System.out.print("\r"+(100*currIter)/iter+"%");
+			System.out.print("\r"+(100*currIter)/iter+"%...");
 			newSolution = bestNeighbor(pb, solution, sizeNL);
 			
 			if (newSolution.evaluation < bestSolution.evaluation)

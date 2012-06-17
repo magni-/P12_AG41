@@ -30,6 +30,8 @@ import java.util.Vector;
  */
 public class Main {
 
+	
+	// Static method to avoid the shallow copy effects of Vector.clone()
 	public static Vector<Batch> cloneVB(Vector<Batch> v) {
 		Vector<Batch> nv = new Vector<Batch>();
 		for(Batch b : v)
@@ -45,15 +47,31 @@ public class Main {
 		//Solution sol = new Solution(pb);
 		//sol.setFromString("25 25/10 15 15 10");
 		
-		int iter = 10000;	// number of taboo iterations
-		int sizeTL = 10;	// taboo length
-		int sizeNL = 50;	// number of neighbors considered per taboo iteration
+		int iter = 1000;	// number of taboo iterations
+		int sizeTL = 5;		// taboo length
+		int sizeNL = 10;	// number of neighbors considered per taboo iteration
+		
+		if (args.length == 3) {
+			try {
+				iter = Integer.parseInt(args[0]);
+				sizeTL = Integer.parseInt(args[1]);
+				sizeNL = Integer.parseInt(args[2]);
+	        } catch (NumberFormatException nfe) {
+	            System.out.println("If user-defined parameters, they must be three integers.");
+	            System.exit(1);
+	        }
+		}
+		
+		System.out.print("Taboo Parameters: \n " +
+				iter + " iterations\n " +
+				sizeTL + " size of taboo list\n " +
+				sizeNL + " neighbors considered per iteration\n\n");
 		
 		Taboo tab = new Taboo(pb, iter, sizeTL, sizeNL);	
 		Solution sol = tab.getBest();
 		
 		sol.evaluate();
-		System.out.println("\rsolution= (eval) " + sol.evaluation + 
+		System.out.println("\r100%...done\n\nsolution= (eval) " + sol.evaluation + 
 				"\n   (prodBatchSeq) " + sol.productionSequenceMT.toString() +
 				"\n   (deliBatchSeq) " + sol.deliverySequenceMT.toString() + "\n");
 	}
