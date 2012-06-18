@@ -438,7 +438,7 @@ public class Solution {
 	}
 	
 	public void setWorst() {
-		evaluation = 1000000.00;
+		evaluation = Double.POSITIVE_INFINITY;
 	}
 	
 	@Override

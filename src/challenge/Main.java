@@ -41,20 +41,20 @@ public class Main {
 	
 	// ----------------------------------------
 	public static void main(String[] args) {
-		Problem pb = new Problem("data/problem003-050.txt");
+		Problem pb = new Problem("data/problem-001-300.txt");
 		//System.out.println("problem=" + pb.toString() + "\n");
 
 		//Solution sol = new Solution(pb);
 		//sol.setFromString("25 25/10 15 15 10");
 		
-		int iter = 1000;	// number of taboo iterations
-		int sizeTL = 5;		// taboo length
-		int sizeNL = 10;	// number of neighbors considered per taboo iteration
-		int var = 3;		// max variation between neighbor solutions
+		long length = 10000;						// length of the taboo search in milliseconds
+		int sizeTL = (int) (1.6 * pb.transporter.getCapacity());		// taboo length
+		int sizeNL = pb.transporter.getCapacity();	// number of neighbors considered per taboo iteration
+		int var = pb.transporter.getCapacity();		// max variation between neighbor solutions
 		
 		if (args.length == 4) {
 			try {
-				iter = Integer.parseInt(args[0]);
+				length = Long.parseLong(args[0]);
 				sizeTL = Integer.parseInt(args[1]);
 				sizeNL = Integer.parseInt(args[2]);
 				var = Integer.parseInt(args[3]);
@@ -65,12 +65,12 @@ public class Main {
 		}
 		
 		System.out.print("Taboo Parameters: \n " +
-				iter + " iterations\n " +
+				length + " milliseconds\n " +
 				sizeTL + " size of taboo list\n " +
 				sizeNL + " neighbors considered per iteration\n " +
 				var + " max variation between neighbor solutions\n\n");
 		
-		Taboo tab = new Taboo(pb, iter, sizeTL, sizeNL, var);	
+		Taboo tab = new Taboo(pb, length, sizeTL, sizeNL, var);	
 		Solution sol = tab.getBest();
 		
 		sol.evaluate();

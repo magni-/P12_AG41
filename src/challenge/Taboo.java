@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Random;
 
 public class Taboo {
+	protected long start, end;
+	
 	protected ArrayList<Solution> tabooList;
 	protected int tabooLength;
 	protected Solution solution;
@@ -135,7 +137,10 @@ public class Taboo {
 		return best;
 	}
 	
-	public Taboo(Problem pb, int iter, int sizeTL, int sizeNL, int var) {
+	public Taboo(Problem pb, long length, int sizeTL, int sizeNL, int var) {
+		start = System.currentTimeMillis();
+		end = start;
+		
 		tabooList = new ArrayList<Solution>();
 		tabooLength = sizeTL;
 		solution = randomSolution(pb);
@@ -143,10 +148,9 @@ public class Taboo {
 		bestSolution = solution.clone(pb);
 		
 		tabooList.add(solution.clone(pb));
-	
-		int currIter = 0;
-		while (currIter < iter) {
-			System.out.print("\r"+(100*currIter)/iter+"%...");
+		
+		while (end - start < length) {
+			System.out.print("\r" + (int) (100 * (end - start)/length) + "%...");
 			newSolution = bestNeighbor(pb, solution, sizeNL, var);
 			
 			if (newSolution.evaluation < bestSolution.evaluation)
@@ -158,7 +162,7 @@ public class Taboo {
 			tabooList.add(newSolution.clone(pb));
 			solution = newSolution.clone(pb);
 			
-			++currIter;
+			end = System.currentTimeMillis();
 		}
 	}
 	
