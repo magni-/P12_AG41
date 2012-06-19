@@ -23,9 +23,12 @@ import java.util.Vector;
 
 /**
  * 
- * @author Olivier Grunder
- * @version 0.02
- * @date 23 mai 2012
+ * @author Paul Mollet-Padier, Olivier Grunder
+ * @version 0.03
+ * @date 19 June 2012
+ * 
+ * added static Vector<Batch> cloneVB(Vector<Batch>)
+ * changed main()
  * 
  */
 public class Main {
@@ -41,7 +44,7 @@ public class Main {
 	
 	// ----------------------------------------
 	public static void main(String[] args) {
-		String pbS = "data/problem-011-100.txt";
+		String pbS = "data/problem003-050.txt";
 		if (args.length > 0) {
 			pbS = args[0];	
 		}
@@ -76,7 +79,7 @@ public class Main {
 				sizeNL = Integer.parseInt(args[3]);
 				var = Integer.parseInt(args[4]);
 	        } catch (NumberFormatException nfe) {
-	            System.out.println("If user-defined parameters, they must be four integers.");
+	            System.out.println("If parameters are user-defined, they must be four integers.");
 	            System.exit(1);
 	        }
 		}

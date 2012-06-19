@@ -21,9 +21,12 @@ package challenge;
 
 /**
  * 
- * @author Olivier Grunder
- * @version 0.02
- * @date 23 mai 2012
+ * @author Paul Mollet-Padier, Olivier Grunder
+ * @version 0.03
+ * @date 19 June 2012
+ * 
+ * added Solution clone(Problem)
+ *       void setWorst()
  *
  */
 
@@ -96,11 +99,11 @@ public class Solution {
 
 	public Solution clone(Problem pb) {
 		Solution cloneSol = new Solution(pb);
-		cloneSol.productionCompletionTimes = productionCompletionTimes;
+		cloneSol.productionCompletionTimes = productionCompletionTimes;			// primitive types
 		cloneSol.transportationCompletionTimes = transportationCompletionTimes;
 		cloneSol.productionStartingDates = productionStartingDates;
 		
-		cloneSol.deliverySequenceMT = Main.cloneVB(deliverySequenceMT);
+		cloneSol.deliverySequenceMT = Main.cloneVB(deliverySequenceMT);	// object types (Vector<Batch>), need special implementation
 		cloneSol.productionSequenceMT = Main.cloneVB(productionSequenceMT);
 		
 		cloneSol.evaluate();
@@ -436,6 +439,8 @@ public class Solution {
 		Evaluator ev = new Evaluator();
 		return ev.evaluate();
 	}
+	
+	// called by Taboo::bestNeighbor() to initialize the first bestNeighbor
 	
 	public void setWorst() {
 		evaluation = Double.POSITIVE_INFINITY;

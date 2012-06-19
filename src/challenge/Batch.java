@@ -21,10 +21,13 @@ package challenge;
 
 /**
  * 
- * @author Olivier Grunder
- * @version 0.01
- * @date 14 mai 2012
+ * @author Paul Mollet-Padier, Olivier Grunder
+ * @version 0.02
+ * @date 19 June 2012
  * 
+ * added int incQuantity(int)
+ *       int decQuantity(int)
+ *       Batch clone()
  */
 public class Batch {
 
@@ -48,9 +51,13 @@ public class Batch {
 		this.quantity = quantity;
 	}
 	
+	// increments a batch's quantity
+	
 	public void incQuantity(int inc) {
 		quantity += inc;
 	}
+	
+	// decrements a batch's quantity
 	
 	public void decQuantity(int dec) {
 		quantity -= dec;
@@ -59,6 +66,9 @@ public class Batch {
 	public String toString() {
 		return new String("" + quantity);
 	}
+	
+	// called by the static method Main.cloneVB
+	// (since v.clone() and new Vector(v) do not clone the vector element values but their references instead)
 	
 	public Batch clone() {
 		return new Batch(quantity);

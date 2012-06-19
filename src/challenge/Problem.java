@@ -42,12 +42,6 @@ public class Problem {
 	 * Due dates of the parts
 	 */
 	protected double[] dueDates;
-
-	/**
-	 * Number of distinct due dates
-	 */
-	
-	protected int nDDD;
 	
 	/**
 	 * customer holding cost per unit of time and per part
@@ -85,9 +79,6 @@ public class Problem {
 
 	public Problem(String string) {
 		open(string);
-		nDDD = 1;
-		for(int i = 1; i < dueDates.length; ++i)
-			nDDD += dueDates[i] == dueDates[i-1] ? 0 : 1;
 	}
 
 	// Getters
