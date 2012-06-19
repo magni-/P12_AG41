@@ -41,22 +41,42 @@ public class Main {
 	
 	// ----------------------------------------
 	public static void main(String[] args) {
-		Problem pb = new Problem("data/problem-011-200.txt");
+		String pbS = "data/problem-011-100.txt";
+		if (args.length > 0) {
+			pbS = args[0];	
+		}
+		Problem pb = new Problem(pbS);
 		int n = pb.getNp();
 		
-		long length = 200 * n;	// length of the taboo search in milliseconds
-		int sizeTL = 1000;		// taboo length
-		int sizeNL = 1000;		// number of neighbors considered per taboo iteration
-		int var = (int) (0.75 * n);	// max variation between neighbor solutions
+		long length;	// length of the taboo search in milliseconds
+		switch (n) {
+		case 50:
+		case 100:
+			length = 15000;
+			break;
+		case 150:
+		case 200:
+			length = 30000;
+			break;
+		case 300:
+			length = 60000;
+			break;
+		default:
+			length = 200 * n;
+			break;			
+		}
+		int sizeTL = 36 * n;		// taboo length
+		int sizeNL = 35 * n;		// number of neighbors considered per taboo iteration
+		int var = n / 2;	// max variation between neighbor solutions
 		
-		if (args.length == 4) {
+		if (args.length == 5) {
 			try {
-				length = Long.parseLong(args[0]);
-				sizeTL = Integer.parseInt(args[1]);
-				sizeNL = Integer.parseInt(args[2]);
-				var = Integer.parseInt(args[3]);
+				length = Long.parseLong(args[1]);
+				sizeTL = Integer.parseInt(args[2]);
+				sizeNL = Integer.parseInt(args[3]);
+				var = Integer.parseInt(args[4]);
 	        } catch (NumberFormatException nfe) {
-	            System.out.println("If user-defined parameters, they must be three integers.");
+	            System.out.println("If user-defined parameters, they must be four integers.");
 	            System.exit(1);
 	        }
 		}

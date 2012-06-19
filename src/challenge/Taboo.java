@@ -158,8 +158,6 @@ public class Taboo {
 		solution = randomSolution(pb);
 		bestSolution = solution.clone(pb);
 		
-		System.out.println(solution.deliverySequenceMT);
-		
 		tabooList.add(solution.clone(pb));
 		
 		while (end - start < length) {
