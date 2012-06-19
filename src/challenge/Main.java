@@ -41,16 +41,13 @@ public class Main {
 	
 	// ----------------------------------------
 	public static void main(String[] args) {
-		Problem pb = new Problem("data/problem-001-300.txt");
-		//System.out.println("problem=" + pb.toString() + "\n");
-
-		//Solution sol = new Solution(pb);
-		//sol.setFromString("25 25/10 15 15 10");
+		Problem pb = new Problem("data/problem-011-200.txt");
+		int n = pb.getNp();
 		
-		long length = 10000;						// length of the taboo search in milliseconds
-		int sizeTL = (int) (1.6 * pb.transporter.getCapacity());		// taboo length
-		int sizeNL = pb.transporter.getCapacity();	// number of neighbors considered per taboo iteration
-		int var = pb.transporter.getCapacity();		// max variation between neighbor solutions
+		long length = 200 * n;	// length of the taboo search in milliseconds
+		int sizeTL = 1000;		// taboo length
+		int sizeNL = 1000;		// number of neighbors considered per taboo iteration
+		int var = (int) (0.75 * n);	// max variation between neighbor solutions
 		
 		if (args.length == 4) {
 			try {
@@ -76,6 +73,7 @@ public class Main {
 		sol.evaluate();
 		System.out.println("\r100%...done\n\nsolution= (eval) " + sol.evaluation + 
 				"\n   (prodBatchSeq) " + sol.productionSequenceMT.toString() +
-				"\n   (deliBatchSeq) " + sol.deliverySequenceMT.toString() + "\n");
+				"\n   (deliBatchSeq) " + sol.deliverySequenceMT.toString() +
+				"\n found after " + (tab.timeBestFound / 1000) + "." + (tab.timeBestFound % 1000) + " seconds.\n");
 	}
 }

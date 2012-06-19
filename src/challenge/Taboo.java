@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Random;
 
 public class Taboo {
-	protected long start, end;
+	protected long start, end, timeBestFound;
 	
 	protected ArrayList<Solution> tabooList;
 	protected int tabooLength;
@@ -20,33 +20,41 @@ public class Taboo {
 		
 		// n number of total jobs, r randomly chosen number of jobs for each batch
 		
-		int n = pb.getNp(), r;
-		String solStr = "";
+		int n = pb.getNp(), rj, rb;
 		Solution sol = new Solution(pb);
 		Random rand = new Random();;
 		
 		// random selection of production batches
 		
 		while (n > 0) {
-			r = rand.nextInt(n) + 1;
-			solStr += r + " ";
-			n -= r;
+			rj = rand.nextInt(n) + 1;
+			rb = rand.nextInt(sol.getProductionSequenceMT().size()+1);
+			sol.getProductionSequenceMT().add(rb,new Batch(rj));
+			n -= rj;
 		}
 		
-		solStr = solStr.substring(0, solStr.length() - 1) + "/";
 		n = pb.getNp();
 		
 		// random selection of transport batches
 		
-		int cap = pb.transporter.getCapacity();
 		while (n > 0) {
-			r = rand.nextInt(Math.min(n,cap)) + 1; // can't exceed transporter's capacity in a delivery batch
-			solStr += r + " ";
-			n -= r;
+			rj = rand.nextInt(Math.min(pb.transporter.getCapacity(),n)) + 1;
+			rb = rand.nextInt(sol.getDeliverySequenceMT().size()+1);
+			sol.getDeliverySequenceMT().add(rb,new Batch(rj));
+			n -= rj;
 		}
 		
-		solStr = solStr.substring(0, solStr.length() - 1);
-		sol.setFromString(solStr);
+/*		int cap = pb.transporter.getCapacity();
+		for(int i = 0; i < pb.nDDD-1; ++i) {
+			rj = rand.nextInt(Math.min(n-pb.nDDD+1+i,cap)) + 1; // can't exceed transporter's capacity in a delivery batch
+			rb = rand.nextInt(sol.getDeliverySequenceMT().size()+1);
+			sol.getDeliverySequenceMT().add(rb,new Batch(rj));
+			n -= rj;
+		}
+		rb = rand.nextInt(pb.nDDD);
+		sol.getDeliverySequenceMT().add(rb,new Batch(n));
+*/		
+		sol.evaluate();
 		
 		return sol;
 	}
@@ -104,7 +112,7 @@ public class Taboo {
 			do {
 				randBatch = rand.nextInt(dS);
 				if (tmp.getDeliverySequenceMT().elementAt(randBatch).getQuantity() <= dWvar) {  
-					dWvar = dWvar - tmp.getDeliverySequenceMT().elementAt(randBatch).getQuantity();
+					dWvar -= tmp.getDeliverySequenceMT().elementAt(randBatch).getQuantity();
 					tmp.getDeliverySequenceMT().remove(randBatch);
 					--dS;
 				} else {
@@ -113,17 +121,21 @@ public class Taboo {
 				}
 			} while (dWvar > 0);
 			
-			boolean repeat;
+			dWvar = bNvar;
 			do {
-				repeat = false;
 				randBatch = rand.nextInt(2*dS);
 				if (randBatch >= dS) {
 					randBatch = rand.nextInt(dS+1);
-					tmp.getDeliverySequenceMT().add(randBatch, new Batch(0));
-				} else if (tmp.getDeliverySequenceMT().elementAt(randBatch).getQuantity() == cap)
-					repeat = true;
-			} while (repeat);
-			tmp.getDeliverySequenceMT().elementAt(randBatch).incQuantity(bNvar);
+					tmp.getDeliverySequenceMT().add(randBatch, new Batch(Math.min(dWvar, cap)));
+					dWvar -= dWvar > cap ? cap : dWvar;
+				} else if (tmp.getDeliverySequenceMT().elementAt(randBatch).getQuantity() >= cap - dWvar) { 
+					dWvar -= cap - tmp.getDeliverySequenceMT().elementAt(randBatch).getQuantity(); 
+					tmp.getDeliverySequenceMT().elementAt(randBatch).setQuantity(cap);
+				} else {
+					tmp.getDeliverySequenceMT().elementAt(randBatch).incQuantity(dWvar);
+					dWvar = 0;
+				}
+			} while (dWvar > 0);
 			
 			tmp.evaluate();
 					
@@ -144,25 +156,28 @@ public class Taboo {
 		tabooList = new ArrayList<Solution>();
 		tabooLength = sizeTL;
 		solution = randomSolution(pb);
-		solution.evaluate();
 		bestSolution = solution.clone(pb);
+		
+		System.out.println(solution.deliverySequenceMT);
 		
 		tabooList.add(solution.clone(pb));
 		
 		while (end - start < length) {
+			end = System.currentTimeMillis();
+			
 			System.out.print("\r" + (int) (100 * (end - start)/length) + "%...");
 			newSolution = bestNeighbor(pb, solution, sizeNL, var);
 			
-			if (newSolution.evaluation < bestSolution.evaluation)
+			if (newSolution.evaluation < bestSolution.evaluation) {
 				bestSolution = newSolution.clone(pb);
+				timeBestFound = end - start;
+			}
 			
 			if (tabooList.size() == tabooLength)
 				tabooList.remove(0);
 			
 			tabooList.add(newSolution.clone(pb));
 			solution = newSolution.clone(pb);
-			
-			end = System.currentTimeMillis();
 		}
 	}
 	
